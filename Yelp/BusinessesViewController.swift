@@ -8,9 +8,11 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     var businesses: [Business]!
+    var searchBar: UISearchBar!
+    var alertController: UIAlertController!
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
@@ -33,7 +35,14 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             
             }
         )
+        searchBar = UISearchBar()
+        searchBar.sizeToFit()
+        navigationItem.titleView = searchBar
+        searchBar.delegate = self
         
+        alertController = UIAlertController(title: "No Results!", message: "Please try another search term.", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(okAction)
         /* Example of Yelp search with more search options specified
          Business.searchWithTerm("Restaurants", sort: .distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: Error!) -> Void in
          self.businesses = businesses
@@ -45,6 +54,32 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
          }
          */
         
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let searchTerm = searchBar.text!
+        Business.searchWithTerm(term: searchTerm, completion: { (businesses: [Business]?, error: Error?) -> Void in
+            
+            self.businesses = businesses
+            self.tableView.reloadData()
+            if let businesses = businesses {
+                if(businesses.count < 1){
+                    self.present(self.alertController, animated: true)
+                }
+                
+            }
+            
+        }
+        )
+    }
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        self.searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

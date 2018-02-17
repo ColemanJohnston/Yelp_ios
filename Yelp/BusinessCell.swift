@@ -33,8 +33,13 @@ class BusinessCell: UITableViewCell {
         super.awakeFromNib()
         thumbImageView.layer.cornerRadius = 3
         thumbImageView.clipsToBounds = true
+        
     }
-
+    
+    override func layoutSubviews(){
+        super.layoutSubviews()
+    }
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
